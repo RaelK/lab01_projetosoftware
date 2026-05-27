@@ -1,0 +1,27 @@
+﻿@startuml
+left to right direction
+skinparam actorStyle awesome
+actor Aluno
+actor Professor
+actor Secretaria
+actor "Sistema de Cobranças" as Cob
+rectangle "Sistema de Matrículas" {
+  usecase "Autenticar-se" as UCLogin
+  usecase "Consultar Currículo do Semestre" as UCCurriculo
+  usecase "Matricular-se em Disciplinas" as UCMatricular
+  usecase "Cancelar Matrícula" as UCCancelar
+  usecase "Confirmar Inscrição no Semestre" as UCConfirmar
+  usecase "Manter Cursos/Disciplinas" as UCManter
+  usecase "Abrir/Fechar Período de Matrículas" as UCPeriodo
+  usecase "Consultar Alunos Matriculados" as UCListar
+}
+Aluno --> UCLogin
+Aluno --> UCCurriculo
+Aluno --> UCMatricular
+Aluno --> UCCancelar
+Aluno --> UCConfirmar
+Secretaria --> UCManter
+Secretaria --> UCPeriodo
+Professor --> UCListar
+UCConfirmar --> Cob : <<notificar cobrança>>
+@enduml

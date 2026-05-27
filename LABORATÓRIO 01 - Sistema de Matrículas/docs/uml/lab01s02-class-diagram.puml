@@ -1,0 +1,76 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+package domain {
+  class Usuario {
+    -id: String
+    -nome: String
+    -email: String
+    -senhaHash: String
+  }
+  class Aluno {
+    -matricula: String
+    -obrigSel: int
+    -optSel: int
+    +podeObrig(): boolean
+    +podeOpt(): boolean
+  }
+  class Professor { -siape: String }
+  class Curso { -codigo: String ; -nome: String ; -creditos: int }
+  enum TipoDisciplina { OBRIGATORIA ; OPTATIVA }
+  class Disciplina {
+    -codigo: String
+    -nome: String
+    -tipo: TipoDisciplina
+    -capacidadeMax: int = 60
+    -ativa: boolean
+    +temVaga(inscritos: int): boolean
+  }
+  enum StatusMatricula { PENDENTE ; CONFIRMADA ; CANCELADA }
+  class Matricula {
+    -id: String
+    -semestre: String
+    -status: StatusMatricula
+    +confirmar()
+    +cancelar()
+  }
+  class PeriodoMatriculas {
+    -aberto: boolean
+    +abrir()
+    +fechar()
+    +isAberto(): boolean
+  }
+}
+package application {
+  class AutenticacaoService { +login(email: String, senha: String): Usuario }
+  class MatriculaService {
+    +adicionarDisciplina(alunoId: String, discCod: String)
+    +cancelarDisciplina(alunoId: String, discCod: String)
+    +confirmarInscricao(alunoId: String): String
+    +fechamentoPeriodo(): void
+  }
+  class SecretariaService {
+    +criarCurso()
+    +criarDisciplina()
+    +atribuirProfessor()
+    +abrirPeriodo()
+    +fecharPeriodo()
+  }
+  interface CobrancaGateway { +notificarInscricao(alunoId: String, codDisciplinas: List<String>): void }
+}
+package infrastructure {
+  interface AlunoRepository { +byEmail(email: String): Aluno ; +save(a: Aluno): void }
+  interface ProfessorRepository { }
+  interface CursoRepository { }
+  interface DisciplinaRepository { +findAbertas(): List<Disciplina> ; +save(d: Disciplina): void }
+  interface MatriculaRepository { +findByAlunoSemestre(aId: String, sem: String): Matricula ; +save(m: Matricula): void }
+  class FileStorage { -basePath: String }
+}
+Usuario <|-- Aluno
+Usuario <|-- Professor
+Curso "1" o-- "*" Disciplina
+Professor "1" o-- "*" Disciplina
+Aluno "1" o-- "*" Matricula
+Matricula "*" --> "*" Disciplina
+PeriodoMatriculas ..> MatriculaService
+MatriculaService ..> CobrancaGateway
+@enduml

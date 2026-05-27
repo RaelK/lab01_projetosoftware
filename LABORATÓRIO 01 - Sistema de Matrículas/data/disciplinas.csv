@@ -1,0 +1,4 @@
+# codigo;nome;tipo;capacidade;ativa
+MAT101;Cálculo I;OBRIGATORIA;60;true
+FIS101;Física I;OBRIGATORIA;60;true
+HUM201;Ética e Sociedade;OPTATIVA;60;true
