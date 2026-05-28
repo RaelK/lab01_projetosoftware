@@ -103,3 +103,15 @@ if (regras.get(d.getTipo()).excede(atuais)) return regras.get(d.getTipo()).mensa
 Benefícios: Open/Closed Principle — para adicionar um novo tipo (ex.: "ELETIVA" com limite de 1), basta criar uma nova classe sem tocar no service.
 
   */
+
+/* 
+Matricula tem três estados (PENDENTE, CONFIRMADA, CANCELADA) e regras de transição implícitas. Hoje qualquer um pode chamar confirmar() mesmo numa matrícula cancelada.
+Sugestão: aplicar o State Pattern ou, mais simples, validar transições no próprio método (ver comentário #2). Para um sistema maior, vale criar uma máquina de estados explícita:
+javaprivate static final Map<StatusMatricula, Set<StatusMatricula>> TRANSICOES_VALIDAS = Map.of(
+    PENDENTE,    Set.of(CONFIRMADA, CANCELADA),
+    CONFIRMADA,  Set.of(CANCELADA),
+    CANCELADA,   Set.of()
+);
+Benefícios: invariantes garantidas, transições inválidas viram exceções claras em vez de bugs silenciosos.
+  */
+
