@@ -210,7 +210,13 @@ javapublic class App {
     }
 }
 Benefícios: Single Responsibility Principle, arquivos pequenos, fácil onboarding.
-  */
+*/
+
+/*
+Todos os repositórios, serviços e o Scanner são static final. Isso é o oposto de injeção de dependência: impossível trocar FileStorage por um InMemoryStorage em teste, impossível ter duas instâncias do app, e o estado do Scanner vaza por toda a classe.
+Sugestão: transformar a classe em instância, receber dependências no construtor (manual ou via container leve como Guice/Dagger). Já há frameworks como Spring Boot que fariam isso automaticamente — mas mesmo sem framework, basta tirar os static.
+Benefícios: testabilidade, ciclo de vida controlado, alinhamento com a Injeção de Dependências do comentário #1.
+*/
 
 //Os services retornam String com mensagens já formatadas para o usuário (ex.: "Disciplina sem vagas.", "Limite de 4 obrigatórias atingido."). Isso acopla a regra de negócio à apresentação CLI e impede internacionalização ou reuso em uma futura interface web/REST.
 //Sugestão: retornar um objeto de resultado (Result Pattern) com um código de status enumerado e deixar a formatação para a camada cli.
