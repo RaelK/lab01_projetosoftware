@@ -20,3 +20,14 @@ public class ComprovanteWriter {
     fs.write("events/comprovantes/comprovante-"+alunoId+"-"+semestre+"-"+ts+".txt", sb.toString());
   }
 }
+
+/*
+A montagem do comprovante com StringBuilder e concatenações é frágil e difícil de evoluir (e se mudar o formato para HTML/PDF?).
+Sugestão: isolar a formatação atrás de uma interface FormatadorComprovante e ter implementações FormatadorTexto, FormatadorHtml, etc. (combina Strategy + Builder). Ou usar uma classe ComprovanteBuilder fluente:
+javaString conteudo = ComprovanteBuilder.novo()
+    .comAluno(alunoId)
+    .comSemestre(semestre)
+    .comDisciplinas(disciplinas)
+    .build();
+Benefícios: legibilidade, flexibilidade de formato, testabilidade do conteúdo independente da escrita em disco
+  */
