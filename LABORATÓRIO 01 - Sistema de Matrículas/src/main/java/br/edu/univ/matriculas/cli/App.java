@@ -220,3 +220,18 @@ Benefícios: testabilidade, ciclo de vida controlado, alinhamento com a Injeçã
 
 //Os services retornam String com mensagens já formatadas para o usuário (ex.: "Disciplina sem vagas.", "Limite de 4 obrigatórias atingido."). Isso acopla a regra de negócio à apresentação CLI e impede internacionalização ou reuso em uma futura interface web/REST.
 //Sugestão: retornar um objeto de resultado (Result Pattern) com um código de status enumerado e deixar a formatação para a camada cli.
+
+/*
+(linhas 51, 53-60, 62-69, 71-86)
+A validação (isSemestre, askSemestre, askAlunoId, askDisciplinaCodigo) está dentro de App. Em uma futura interface web, tudo isso teria que ser reescrito.
+Sugestão: centralizar em Value Objects no domínio que se autovalidam:
+javapublic record Semestre(String valor) {
+    private static final Pattern PADRAO = Pattern.compile("^\\d{4}\\.(1|2)$");
+    public Semestre {
+        if (!PADRAO.matcher(valor).matches())
+            throw new IllegalArgumentException("Semestre inválido: " + valor);
+    }
+}
+Aplicar também para AlunoId, CodigoDisciplina.
+Benefícios: validação onde o tipo nasce, regras impossíveis de burlar, mais um conceito do DDD aplicado.
+*/
