@@ -22,3 +22,11 @@ public class PeriodoConfigStore {
     fs.write(path, json);
   }
 }
+
+/* 
+A leitura faz indexOf("periodoAberto") + contains("true"). Isso quebra com qualquer espaço estranho, comentário, ou se houver outra chave que contenha a palavra "true".
+Sugestão: usar uma lib de JSON real (Jackson, Gson) ou — mais simples ainda — guardar como .properties:
+propertiesperiodoAberto=true
+Que se lê com java.util.Properties em duas linhas, sem dependências.
+Benefícios: robustez, menos código, formato padrão.
+*/

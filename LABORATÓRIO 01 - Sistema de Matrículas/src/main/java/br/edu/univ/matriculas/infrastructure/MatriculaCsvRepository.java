@@ -107,3 +107,32 @@ public class MatriculaCsvRepository {
     return new ArrayList<>(ids);
   }
 }
+
+/*
+Os métodos findByCodigo, findAll, countInscritos etc. chamam parse() que lê o arquivo do disco a cada invocação. Em um fluxo como adicionarDisciplina (MatriculaService), o arquivo é lido 3-4 vezes em um único caso de uso.
+Sugestão: implementar Unit of Work ou um simples cache in-memory carregado uma vez por requisição CLI:
+javaprivate List<Disciplina> cache;
+private List<Disciplina> parse() {
+    if (cache == null) cache = doParse();
+    return cache;
+}
+public void invalidate() { cache = null; }
+Ou, melhor ainda, ler tudo no construtor e tratar o repositório como uma in-memory store que faz flush no save().
+Benefícios: ordens de magnitude de performance e menos I/O.
+*/
+
+
+/*
+(linhas 33, 38, 56, 71, 88, 96)
+O campo status na Row é uma String ("PENDENTE", "CONFIRMADA", "CANCELADA") comparada com literais espalhados pelo código. Já existe o enum StatusMatricula no domínio — ele está sendo ignorado pela infra.
+Sugestão: usar o enum dentro de Row:
+javaprivate static class Row {
+    String alunoId, discCod;
+    StatusMatricula status;
+}
+// ao parsear:
+row.status = StatusMatricula.valueOf(p[2]);
+// comparação:
+if (r.status != StatusMatricula.CANCELADA) ...
+Benefícios: type-safety (typo de "CANCELDA" deixa de compilar), refactor automático na IDE, fim das comparações com string mágica.
+*/

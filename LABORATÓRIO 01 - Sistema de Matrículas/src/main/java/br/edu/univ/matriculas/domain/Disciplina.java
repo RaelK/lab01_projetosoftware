@@ -20,3 +20,6 @@ public class Disciplina {
   public boolean isAtiva() { return ativa; }
   public void setAtiva(boolean ativa) { this.ativa = ativa; }
 }
+
+//As classes de domínio são praticamente structs com getters/setters. Toda a regra de negócio mora em MatriculaService (linhas 27-38), violando o princípio "Tell, Don't Ask" e gerando um Anemic Domain Model (anti-pattern descrito por Fowler).
+//Sugestão: mover as invariantes para as próprias entidades.

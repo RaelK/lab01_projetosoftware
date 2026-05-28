@@ -30,7 +30,20 @@ public class DisciplinaCsvRepository {
     }
     return out;
   }
-
+/*(linha 28)
+javatry { d.setCapacidadeMax(Integer.parseInt(p[3].trim())); } catch (Exception e) { d.setCapacidadeMax(60); }
+Capturar Exception (genérica) e silenciosamente reverter a default é um anti-pattern ("exception swallowing"). Se o CSV tem dado corrompido, o usuário nunca saberá.
+Sugestão:
+javatry {
+    d.setCapacidadeMax(Integer.parseInt(p[3].trim()));
+} catch (NumberFormatException e) {
+    logger.warn("Capacidade inválida na linha '{}', usando default {}", line, CAPACIDADE_PADRAO);
+    d.setCapacidadeMax(CAPACIDADE_PADRAO);
+}
+E pelo menos use NumberFormatException específica em vez de Exception (que pegaria até NullPointerException).
+Benefícios: observabilidade, conformidade com SonarLint/PMD.
+*/
+  
   private void writeAll(List<Disciplina> ds){
     String header = "# codigo;nome;tipo;capacidade;ativa";
     String body = ds.stream().map(d ->
@@ -41,6 +54,15 @@ public class DisciplinaCsvRepository {
     ).collect(Collectors.joining(System.lineSeparator()));
     fs.write(path, header + System.lineSeparator() + body);
   }
+
+  /*
+  O método writeAll reescreve o arquivo inteiro a cada operação. Se o processo for interrompido durante a escrita, o arquivo fica corrompido / parcialmente vazio.
+Sugestão: escrever primeiro em um arquivo temporário e depois renomear atomicamente (Files.move com ATOMIC_MOVE):
+javaPath tmp = Files.createTempFile(p.getParent(), p.getFileName().toString(), ".tmp");
+Files.writeString(tmp, body, ...);
+Files.move(tmp, p, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+Benefícios: durabilidade — o arquivo final ou está intacto antes da operação, ou intacto depois. Sem estado intermediário corrompido.
+*/
 
   public List<Disciplina> findAll(){ return parse(); }
   public List<Disciplina> findAbertas(){
@@ -63,3 +85,16 @@ public class DisciplinaCsvRepository {
     writeAll(ds);
   }
 }
+
+/*
+Os métodos findByCodigo, findAll, countInscritos etc. chamam parse() que lê o arquivo do disco a cada invocação. Em um fluxo como adicionarDisciplina (MatriculaService), o arquivo é lido 3-4 vezes em um único caso de uso.
+Sugestão: implementar Unit of Work ou um simples cache in-memory carregado uma vez por requisição CLI:
+javaprivate List<Disciplina> cache;
+private List<Disciplina> parse() {
+    if (cache == null) cache = doParse();
+    return cache;
+}
+public void invalidate() { cache = null; }
+Ou, melhor ainda, ler tudo no construtor e tratar o repositório como uma in-memory store que faz flush no save().
+Benefícios: ordens de magnitude de performance e menos I/O.
+*/

@@ -10,3 +10,5 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
+
+//O pom.xml não declara nenhuma dependência de teste (junit, mockito, assertj) e não há diretório src/test/java. Para um sistema com regras críticas (limite de obrigatórias, capacidade, fechamento de período) isso é arriscado.

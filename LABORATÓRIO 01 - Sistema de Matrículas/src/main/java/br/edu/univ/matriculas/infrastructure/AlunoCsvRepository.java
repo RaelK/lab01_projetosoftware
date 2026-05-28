@@ -11,6 +11,13 @@ public class AlunoCsvRepository {
     public AlunoDTO(String id, String nome, String email){ this.id=id; this.nome=nome; this.email=email; }
   }
 
+  /*
+  AlunoCsvRepository.AlunoDTO é uma classe interna pública que o ProfessorService importa. Resultado: a camada application tem dependência simbólica de um detalhe de implementação da camada infrastructure.
+Sugestão: mover o DTO (ou converter para record) para application ou usar diretamente a entidade Aluno do domínio:
+java// domain/Aluno.java já existe — basta usá-la
+public Optional<Aluno> findById(String id) { ... }
+Benefícios: respeito ao sentido das dependências, eliminação de DTO duplicado, uso do modelo de domínio.
+*/
   public AlunoCsvRepository(FileStorage fs){ this.fs = fs; }
 
   public List<AlunoDTO> findAll(){

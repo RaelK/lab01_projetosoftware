@@ -11,6 +11,18 @@ import java.util.Scanner;
 public class App {
   private static final Scanner in = new Scanner(System.in);
 
+  /*
+  private static final Scanner in = new Scanner(System.in); permanece aberto até o fim da JVM. Não é grave para o System.in (o SO libera), mas é mau hábito em Java e o IDE acusa "resource leak".
+Sugestão: envolver em try-with-resources no main:
+javapublic static void main(String[] args) {
+    try (Scanner in = new Scanner(System.in)) {
+        new App(in).run();
+    }
+}
+Bônus: facilita os testes (basta passar um Scanner baseado em String no construtor).
+Benefícios: boa prática, eliminação de warning, testabilidade.
+*/
+
   private static final FileStorage FS = new FileStorage("data");
   private static final DisciplinaCsvRepository DISC_REPO = new DisciplinaCsvRepository(FS);
   private static final PeriodoConfigStore PERIOD_STORE = new PeriodoConfigStore(FS);
@@ -199,3 +211,39 @@ public class App {
     pause();
   }
 }
+
+/*
+A classe App tem 200 linhas, gerencia menus de 3 atores diferentes (Aluno, Secretaria, Professor), faz validação de entrada, instancia toda a aplicação e ainda imprime mensagens. É um God Object em formação.
+Sugestão: quebrar em MenuAluno, MenuSecretaria, MenuProfessor (cada um com seu próprio executar()), além de um AppContext (ou CompositionRoot) responsável apenas por instanciar e injetar dependências.
+javapublic class App {
+    public static void main(String[] args) {
+        AppContext ctx = AppContext.bootstrap("data");
+        new MenuPrincipal(ctx).run();
+    }
+}
+Benefícios: Single Responsibility Principle, arquivos pequenos, fácil onboarding.
+*/
+
+/*
+Todos os repositórios, serviços e o Scanner são static final. Isso é o oposto de injeção de dependência: impossível trocar FileStorage por um InMemoryStorage em teste, impossível ter duas instâncias do app, e o estado do Scanner vaza por toda a classe.
+Sugestão: transformar a classe em instância, receber dependências no construtor (manual ou via container leve como Guice/Dagger). Já há frameworks como Spring Boot que fariam isso automaticamente — mas mesmo sem framework, basta tirar os static.
+Benefícios: testabilidade, ciclo de vida controlado, alinhamento com a Injeção de Dependências do comentário #1.
+*/
+
+//Os services retornam String com mensagens já formatadas para o usuário (ex.: "Disciplina sem vagas.", "Limite de 4 obrigatórias atingido."). Isso acopla a regra de negócio à apresentação CLI e impede internacionalização ou reuso em uma futura interface web/REST.
+//Sugestão: retornar um objeto de resultado (Result Pattern) com um código de status enumerado e deixar a formatação para a camada cli.
+
+/*
+(linhas 51, 53-60, 62-69, 71-86)
+A validação (isSemestre, askSemestre, askAlunoId, askDisciplinaCodigo) está dentro de App. Em uma futura interface web, tudo isso teria que ser reescrito.
+Sugestão: centralizar em Value Objects no domínio que se autovalidam:
+javapublic record Semestre(String valor) {
+    private static final Pattern PADRAO = Pattern.compile("^\\d{4}\\.(1|2)$");
+    public Semestre {
+        if (!PADRAO.matcher(valor).matches())
+            throw new IllegalArgumentException("Semestre inválido: " + valor);
+    }
+}
+Aplicar também para AlunoId, CodigoDisciplina.
+Benefícios: validação onde o tipo nasce, regras impossíveis de burlar, mais um conceito do DDD aplicado.
+*/
