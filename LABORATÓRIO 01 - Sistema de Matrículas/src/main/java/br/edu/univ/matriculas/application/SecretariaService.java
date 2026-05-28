@@ -32,3 +32,28 @@ public class SecretariaService {
   public void fecharPeriodo(){ periodo.setAberto(false); }
   public boolean isPeriodoAberto(){ return periodo.isAberto(); }
 }
+
+/*
+ A construção de Disciplina envolve regra (capacidadeMax = 60 default, conversão de string para enum). Isso é responsabilidade típica de uma Factory Method ou Static Factory na própria entidade.
+Sugestão:
+javapublic class Disciplina {
+    public static Disciplina criar(String codigo, String nome, String tipo) {
+        Disciplina d = new Disciplina();
+        d.setCodigo(codigo.toUpperCase());
+        d.setNome(Objects.requireNonNull(nome));
+        d.setTipo(TipoDisciplina.fromString(tipo));
+        d.setCapacidadeMax(CAPACIDADE_PADRAO);
+        d.setAtiva(true);
+        return d;
+    }
+    private static final int CAPACIDADE_PADRAO = 60;
+}
+E no enum:
+javapublic enum TipoDisciplina {
+    OBRIGATORIA, OPTATIVA;
+    public static TipoDisciplina fromString(String s) {
+        return "OBRIGATORIA".equalsIgnoreCase(s) ? OBRIGATORIA : OPTATIVA;
+    }
+}
+Benefícios: lógica de construção centralizada, menos código no service, validação no nascimento do objeto.
+*/
