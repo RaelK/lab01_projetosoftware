@@ -56,6 +56,26 @@ public class MatriculaService {
     return "Inscrição confirmada, comprovante gerado e cobrança notificada.";
   }
 
+  /*
+  Em confirmarInscricao, o service chama cobranca.notificarInscricao(...) e comprovante.emitir(...) em sequência. Se amanhã quisermos enviar e-mail, atualizar BI, gerar PDF, o método cresce indefinidamente.
+Sugestão: aplicar o Observer / Publish-Subscribe Pattern.
+javapublic interface InscricaoListener {
+    void onInscricaoConfirmada(InscricaoConfirmadaEvent ev);
+}
+
+public class MatriculaService {
+    private final List<InscricaoListener> listeners;
+    public String confirmarInscricao(String alunoId, String semestre) {
+        // ...
+        var ev = new InscricaoConfirmadaEvent(alunoId, semestre, confirmadas);
+        listeners.forEach(l -> l.onInscricaoConfirmada(ev));
+        // ...
+    }
+}
+FileCobrancaGateway e ComprovanteWriter viram listeners registrados na composição.
+Benefícios: baixo acoplamento, fácil estender, alinhado a arquiteturas orientadas a eventos.
+*/
+
   public String fechamentoPeriodo(String semestre){
     Set<String> dis = matRepo.listDisciplinasNoSemestre(semestre);
     int ativadas=0, canceladas=0;
