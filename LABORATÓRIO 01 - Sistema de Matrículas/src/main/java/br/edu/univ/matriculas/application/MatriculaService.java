@@ -78,3 +78,28 @@ public class MatriculaService {
     return "Fechamento concluído: ativadas="+ativadas+", canceladas="+canceladas+".";
   }
 }
+
+
+/*
+O bloco que conta obrigatórias/optativas e aplica limites diferentes por tipo é um caso clássico de Strategy.
+Sugestão:
+javapublic interface RegraDeLimite {
+    boolean excede(List<Disciplina> atuais);
+    String mensagemErro();
+}
+
+public class LimiteObrigatorias implements RegraDeLimite {
+    public boolean excede(List<Disciplina> atuais) {
+        return atuais.stream().filter(d -> d.getTipo() == OBRIGATORIA).count() >= 4;
+    }
+    public String mensagemErro() { return "Limite de 4 obrigatórias atingido."; }
+}
+// análogo para LimiteOptativas
+No service:
+javaMap<TipoDisciplina, RegraDeLimite> regras = Map.of(
+    OBRIGATORIA, new LimiteObrigatorias(),
+    OPTATIVA,    new LimiteOptativas());
+if (regras.get(d.getTipo()).excede(atuais)) return regras.get(d.getTipo()).mensagemErro();
+Benefícios: Open/Closed Principle — para adicionar um novo tipo (ex.: "ELETIVA" com limite de 1), basta criar uma nova classe sem tocar no service.
+
+  */
