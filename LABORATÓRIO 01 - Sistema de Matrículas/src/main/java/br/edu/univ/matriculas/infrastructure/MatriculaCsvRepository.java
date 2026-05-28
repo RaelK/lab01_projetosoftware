@@ -120,3 +120,19 @@ public void invalidate() { cache = null; }
 Ou, melhor ainda, ler tudo no construtor e tratar o repositório como uma in-memory store que faz flush no save().
 Benefícios: ordens de magnitude de performance e menos I/O.
 */
+
+
+/*
+(linhas 33, 38, 56, 71, 88, 96)
+O campo status na Row é uma String ("PENDENTE", "CONFIRMADA", "CANCELADA") comparada com literais espalhados pelo código. Já existe o enum StatusMatricula no domínio — ele está sendo ignorado pela infra.
+Sugestão: usar o enum dentro de Row:
+javaprivate static class Row {
+    String alunoId, discCod;
+    StatusMatricula status;
+}
+// ao parsear:
+row.status = StatusMatricula.valueOf(p[2]);
+// comparação:
+if (r.status != StatusMatricula.CANCELADA) ...
+Benefícios: type-safety (typo de "CANCELDA" deixa de compilar), refactor automático na IDE, fim das comparações com string mágica.
+*/
