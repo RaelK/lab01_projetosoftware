@@ -13,6 +13,9 @@ public class MatriculaService {
   private final CobrancaGateway cobranca;
   private final ComprovanteWriter comprovante;
 
+  //A camada application depende diretamente de classes concretas de infrastructure (DisciplinaCsvRepository, MatriculaCsvRepository, PeriodoConfigStore, ComprovanteWriter). Existem interfaces (DisciplinaRepository, MatriculaRepository, AlunoRepository) em infrastructure, mas elas não são usadas em lugar nenhum.
+  //Sugestão: aplicar o Dependency Inversion Principle (SOLID) movendo essas interfaces para o pacote application (ou um subpacote application.ports) e fazendo os serviços dependerem delas — o que já está esboçado pelo CobrancaGateway, o único caso feito corretamente.
+
   public MatriculaService(DisciplinaCsvRepository d, MatriculaCsvRepository m, PeriodoConfigStore p,
                           CobrancaGateway c, ComprovanteWriter comp){
     this.discRepo = d; this.matRepo = m; this.periodo = p; this.cobranca = c; this.comprovante = comp;
