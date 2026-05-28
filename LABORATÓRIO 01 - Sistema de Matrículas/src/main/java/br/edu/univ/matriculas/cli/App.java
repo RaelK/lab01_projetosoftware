@@ -11,6 +11,18 @@ import java.util.Scanner;
 public class App {
   private static final Scanner in = new Scanner(System.in);
 
+  /*
+  private static final Scanner in = new Scanner(System.in); permanece aberto até o fim da JVM. Não é grave para o System.in (o SO libera), mas é mau hábito em Java e o IDE acusa "resource leak".
+Sugestão: envolver em try-with-resources no main:
+javapublic static void main(String[] args) {
+    try (Scanner in = new Scanner(System.in)) {
+        new App(in).run();
+    }
+}
+Bônus: facilita os testes (basta passar um Scanner baseado em String no construtor).
+Benefícios: boa prática, eliminação de warning, testabilidade.
+*/
+
   private static final FileStorage FS = new FileStorage("data");
   private static final DisciplinaCsvRepository DISC_REPO = new DisciplinaCsvRepository(FS);
   private static final PeriodoConfigStore PERIOD_STORE = new PeriodoConfigStore(FS);
