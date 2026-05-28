@@ -36,3 +36,14 @@ public class FileStorage {
     }
   }
 }
+
+/*
+(linhas 19, 28)
+javathrow new RuntimeException("Falha ao escrever arquivo: " + file, e);
+Lançar RuntimeException diretamente é considerado má prática (Effective Java, item 72). O chamador não consegue diferenciar tipos de erro.
+Sugestão: criar uma exceção de domínio da camada de persistência:
+javapublic class PersistenciaException extends RuntimeException {
+    public PersistenciaException(String msg, Throwable cause) { super(msg, cause); }
+}
+Benefícios: chamadores podem fazer catch específico, logs ficam mais expressivos, segue convenção da linguagem.
+*/
