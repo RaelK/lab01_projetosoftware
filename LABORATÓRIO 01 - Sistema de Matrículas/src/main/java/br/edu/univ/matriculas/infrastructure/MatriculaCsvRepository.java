@@ -107,3 +107,16 @@ public class MatriculaCsvRepository {
     return new ArrayList<>(ids);
   }
 }
+
+/*
+Os métodos findByCodigo, findAll, countInscritos etc. chamam parse() que lê o arquivo do disco a cada invocação. Em um fluxo como adicionarDisciplina (MatriculaService), o arquivo é lido 3-4 vezes em um único caso de uso.
+Sugestão: implementar Unit of Work ou um simples cache in-memory carregado uma vez por requisição CLI:
+javaprivate List<Disciplina> cache;
+private List<Disciplina> parse() {
+    if (cache == null) cache = doParse();
+    return cache;
+}
+public void invalidate() { cache = null; }
+Ou, melhor ainda, ler tudo no construtor e tratar o repositório como uma in-memory store que faz flush no save().
+Benefícios: ordens de magnitude de performance e menos I/O.
+*/
