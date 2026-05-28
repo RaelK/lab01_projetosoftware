@@ -42,6 +42,15 @@ public class DisciplinaCsvRepository {
     fs.write(path, header + System.lineSeparator() + body);
   }
 
+  /*
+  O método writeAll reescreve o arquivo inteiro a cada operação. Se o processo for interrompido durante a escrita, o arquivo fica corrompido / parcialmente vazio.
+Sugestão: escrever primeiro em um arquivo temporário e depois renomear atomicamente (Files.move com ATOMIC_MOVE):
+javaPath tmp = Files.createTempFile(p.getParent(), p.getFileName().toString(), ".tmp");
+Files.writeString(tmp, body, ...);
+Files.move(tmp, p, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+Benefícios: durabilidade — o arquivo final ou está intacto antes da operação, ou intacto depois. Sem estado intermediário corrompido.
+*/
+
   public List<Disciplina> findAll(){ return parse(); }
   public List<Disciplina> findAbertas(){
     List<Disciplina> out = new ArrayList<>();
