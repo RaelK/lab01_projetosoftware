@@ -30,7 +30,20 @@ public class DisciplinaCsvRepository {
     }
     return out;
   }
-
+/*(linha 28)
+javatry { d.setCapacidadeMax(Integer.parseInt(p[3].trim())); } catch (Exception e) { d.setCapacidadeMax(60); }
+Capturar Exception (genérica) e silenciosamente reverter a default é um anti-pattern ("exception swallowing"). Se o CSV tem dado corrompido, o usuário nunca saberá.
+Sugestão:
+javatry {
+    d.setCapacidadeMax(Integer.parseInt(p[3].trim()));
+} catch (NumberFormatException e) {
+    logger.warn("Capacidade inválida na linha '{}', usando default {}", line, CAPACIDADE_PADRAO);
+    d.setCapacidadeMax(CAPACIDADE_PADRAO);
+}
+E pelo menos use NumberFormatException específica em vez de Exception (que pegaria até NullPointerException).
+Benefícios: observabilidade, conformidade com SonarLint/PMD.
+*/
+  
   private void writeAll(List<Disciplina> ds){
     String header = "# codigo;nome;tipo;capacidade;ativa";
     String body = ds.stream().map(d ->
