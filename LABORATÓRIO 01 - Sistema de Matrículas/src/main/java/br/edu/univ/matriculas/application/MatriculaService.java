@@ -44,6 +44,28 @@ public class MatriculaService {
     return "OK";
   }
 
+  /*
+  javafor (String cod : atuais) {
+    Optional<Disciplina> ox = discRepo.findByCodigo(cod);
+    if (ox.isPresent()){
+        if (ox.get().getTipo()==TipoDisciplina.OBRIGATORIA) obrig++; else opt++;
+    }
+}
+Usar isPresent() + get() é equivalente a usar null check — desperdiça os recursos do Optional.
+Sugestão:
+javafor (String cod : atuais) {
+    discRepo.findByCodigo(cod).ifPresent(d -> {
+        if (d.getTipo() == OBRIGATORIA) obrig++; else opt++;
+    });
+}
+Ou, ainda mais idiomático, usar Streams:
+javaMap<TipoDisciplina, Long> contagem = atuais.stream()
+    .map(discRepo::findByCodigo)
+    .flatMap(Optional::stream)
+    .collect(Collectors.groupingBy(Disciplina::getTipo, Collectors.counting()));
+Benefícios: estilo funcional, menos linhas, pode evoluir para paralelo facilmente.
+*/
+
   public void cancelarDisciplina(String alunoId, String semestre, String discCod){
     matRepo.cancelar(semestre, alunoId, discCod);
   }
