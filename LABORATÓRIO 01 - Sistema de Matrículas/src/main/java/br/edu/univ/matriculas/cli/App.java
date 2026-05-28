@@ -200,5 +200,17 @@ public class App {
   }
 }
 
+/*
+A classe App tem 200 linhas, gerencia menus de 3 atores diferentes (Aluno, Secretaria, Professor), faz validação de entrada, instancia toda a aplicação e ainda imprime mensagens. É um God Object em formação.
+Sugestão: quebrar em MenuAluno, MenuSecretaria, MenuProfessor (cada um com seu próprio executar()), além de um AppContext (ou CompositionRoot) responsável apenas por instanciar e injetar dependências.
+javapublic class App {
+    public static void main(String[] args) {
+        AppContext ctx = AppContext.bootstrap("data");
+        new MenuPrincipal(ctx).run();
+    }
+}
+Benefícios: Single Responsibility Principle, arquivos pequenos, fácil onboarding.
+  */
+
 //Os services retornam String com mensagens já formatadas para o usuário (ex.: "Disciplina sem vagas.", "Limite de 4 obrigatórias atingido."). Isso acopla a regra de negócio à apresentação CLI e impede internacionalização ou reuso em uma futura interface web/REST.
 //Sugestão: retornar um objeto de resultado (Result Pattern) com um código de status enumerado e deixar a formatação para a camada cli.
